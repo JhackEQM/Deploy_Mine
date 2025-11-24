@@ -1,123 +1,33 @@
-import streamlit as st
-import pandas as pd
-import numpy as np
-import joblib
-import json
-import os
+st.subheader("Completa los datos")
 
-# ================================
-# CARGAR ARTEFACTOS
-# ================================
-ART_DIR = "artefactos"
-PIPE = joblib.load(os.path.join(ART_DIR, "pipeline_RG.joblib"))
-INPUT_SCHEMA = json.load(open(os.path.join(ART_DIR, "input_schema.json")))
-POLICY = json.load(open(os.path.join(ART_DIR, "decision_policy.json")))
+# CATEGORÍAS QUE APRENDIÓ TU MODELO
+gender = st.selectbox("Gender:", ["Female", "Male"])
 
-schema_cols = INPUT_SCHEMA["columns"]
-lower = POLICY["lower"]
-upper = POLICY["upper"]
+age = st.selectbox("Age group:", [
+    "Less than 20",
+    "21 to 35",
+    "36 to 50",
+    "51 or more"
+])
 
-st.title("💼 Predicción Work-Life Balance (WLB)")
-st.subheader("Completa los datos del usuario")
+daily_stress = st.selectbox("Daily Stress (original categories):", [
+    "0", "1", "1/1/00", "2", "3", "4", "5"
+])
 
-
-# ================================
-# VARIABLES DEL DATASET REAL
-# ================================
-
-gender = st.selectbox("Gender:", ["Male", "Female"])
-
-age = st.selectbox(
-    "Age group:",
-    ["Less than 20", "21 to 35", "36 to 50", "51 or more"]  # ← CATEGORÍAS REALES
-)
-
-stress = st.selectbox("Daily Stress (0–5):", [0,1,2,3,4,5])
-
-sleep = st.number_input("Sleep Hours:", min_value=0.0, max_value=12.0, value=7.0)
-
-steps = st.number_input("Daily Steps:", min_value=0, max_value=50000, value=7000)
-
-fruits = st.number_input("Fruits & Veggies Intake:", min_value=0, max_value=20, value=3)
-flow = st.number_input("Flow:", min_value=0, max_value=10, value=5)
-
-lost_vac = st.number_input("Lost Vacation:", 0, 10, 0)
-live_vision = st.number_input("Live Vision:", 0, 10, 5)
-supporting = st.number_input("Supporting Others:", 0, 10, 4)
-awards = st.number_input("Personal Awards:", 0, 10, 1)
-donation = st.number_input("Donation:", 0, 10, 2)
-achievement = st.number_input("Achievement:", 0, 10, 3)
-core = st.number_input("Core Circle:", 0, 10, 5)
-social = st.number_input("Social Network:", 0, 10, 5)
-weekly_med = st.number_input("Weekly Meditation:", 0, 10, 2)
-todo = st.number_input("Todo Completed:", 0, 10, 4)
-bmi = st.number_input("BMI Range:", 0, 10, 2)
-income = st.number_input("Sufficient Income:", 0, 10, 4)
-places = st.number_input("Places Visited:", 0, 10, 3)
-shouting = st.number_input("Daily Shouting:", 0, 10, 0)
-passion = st.number_input("Time for Passion:", 0, 10, 3)
-
-
-# ================================
-# ENSAMBLAR INPUT
-# ================================
+# VARIABLES NUMÉRICAS
+sleep_hours = st.number_input("Sleep Hours", 0.0, 12.0, 7.0)
+steps = st.number_input("Daily Steps", 0.0, 30000.0, 5000.0)
+exercise = st.number_input("Physical Activity", 0.0, 20.0, 3.0)
+water = st.number_input("Hydration (Liters)", 0.0, 5.0, 2.0)
+screen = st.number_input("Screen Time (Hours)", 0.0, 12.0, 4.0)
 
 user_input = {
     "GENDER": gender,
     "AGE": age,
-    "DAILY_STRESS": stress,
-    "SLEEP_HOURS": sleep,
+    "DAILY_STRESS": daily_stress,
+    "SLEEP_HOURS": sleep_hours,
     "DAILY_STEPS": steps,
-    "FRUITS_VEGGIES": fruits,
-    "FLOW": flow,
-    "LOST_VACATION": lost_vac,
-    "LIVE_VISION": live_vision,
-    "SUPPORTING_OTHERS": supporting,
-    "PERSONAL_AWARDS": awards,
-    "DONATION": donation,
-    "ACHIEVEMENT": achievement,
-    "CORE_CIRCLE": core,
-    "SOCIAL_NETWORK": social,
-    "WEEKLY_MEDITATION": weekly_med,
-    "TODO_COMPLETED": todo,
-    "BMI_RANGE": bmi,
-    "SUFFICIENT_INCOME": income,
-    "PLACES_VISITED": places,
-    "DAILY_SHOUTING": shouting,
-    "TIME_FOR_PASSION": passion
+    "PHYSICAL_ACTIVITY": exercise,
+    "HYDRATION": water,
+    "SCREEN_TIME": screen,
 }
-
-
-# ================================
-# PREPROCESS PARA INFERENCIA
-# ================================
-def preprocess(df_raw, schema_cols):
-    df = pd.DataFrame(df_raw)
-
-    # (NO get_dummies; pipeline hace OHE)
-    for col in df.columns:
-        if df[col].dtype == "object":
-            df[col] = df[col].astype("string").str.strip()
-
-    # Agregar columnas faltantes como NaN
-    for col in schema_cols:
-        if col not in df.columns:
-            df[col] = np.nan
-
-    # Ordenar columnas
-    return df[schema_cols]
-
-
-# ================================
-# PREDICCIÓN
-# ================================
-if st.button("🔮 Predecir Score"):
-    df_clean = preprocess([user_input], schema_cols)
-
-    pred_raw = PIPE.predict(df_clean)[0]
-    pred_final = float(np.clip(pred_raw, lower, upper))
-
-    st.success(f"🎯 Work-Life Balance Score: **{pred_final:.2f}**")
-
-    st.write("📘 Datos procesados:")
-    st.dataframe(df_clean)
