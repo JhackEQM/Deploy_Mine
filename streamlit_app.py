@@ -1,82 +1,92 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import joblib
 import json
+import joblib
 import os
 
-# --------------------------
-# Cargar artefactos
-# --------------------------
+st.set_page_config(page_title="Work-Life Balance Predictor", page_icon="🔮")
+
+# ------------------------------------------------------------
+# 1. Cargar artefactos
+# ------------------------------------------------------------
 ART_DIR = "artefactos"
 
-PIPE_PATH = os.path.join(ART_DIR, "pipeline_LR.joblib")  # o pipeline_RG.joblib
 SCHEMA_PATH = os.path.join(ART_DIR, "input_schema.json")
 POLICY_PATH = os.path.join(ART_DIR, "decision_policy.json")
 
+with open(SCHEMA_PATH, "r") as f:
+    INPUT_SCHEMA = json.load(f)
+
+with open(POLICY_PATH, "r") as f:
+    POLICY = json.load(f)
+
+WINNER = POLICY["winner"]
+PIPE_PATH = os.path.join(ART_DIR, f"pipeline_{WINNER}.joblib")
 PIPE = joblib.load(PIPE_PATH)
-INPUT_SCHEMA = json.load(open(SCHEMA_PATH, "r"))
-POLICY = json.load(open(POLICY_PATH, "r"))
 
 schema_cols = INPUT_SCHEMA["columns"]
 lower = POLICY["lower"]
 upper = POLICY["upper"]
 
-st.title("🔮 Predicción Work-Life Balance")
+st.title("🔮 Predicción de Work-Life Balance Score")
 
-# --------------------------
-# Entrada de datos del usuario
-# --------------------------
+# ------------------------------------------------------------
+# 2. Entrada del usuario (adaptar a categorías reales del dataset)
+# ------------------------------------------------------------
 
-st.subheader("Completa los datos")
+st.subheader("Completa los datos del usuario:")
 
 gender = st.selectbox("Gender:", ["Male", "Female"])
-age = st.selectbox("Age group:", ["18-25", "26-33", "34-41", "42-49", "50-57", "58+"])
-stress = st.selectbox("Daily Stress:", ["Low", "Medium", "High"])
+age = st.selectbox("Age group:", ["1/1/00"])   # El dataset tenía valores raros
+stress = st.selectbox("Daily Stress (1–5):", [1, 2, 3, 4, 5])
 
-sleep_hours = st.number_input("Hours of Sleep per Day", 0.0, 12.0, 7.0)
-exercise = st.number_input("Exercise Hours Per Week", 0.0, 20.0, 3.0)
-water = st.number_input("Daily Water Intake (Liters)", 0.0, 5.0, 2.0)
-screen = st.number_input("Daily Screen Time (Hours)", 0.0, 12.0, 4.0)
+sleep_hours = st.number_input("Sleep Hours", min_value=0.0, max_value=12.0, value=7.0)
+daily_steps = st.number_input("Daily Steps", min_value=0, max_value=20000, value=7000)
+fruits = st.number_input("Fruits & Veggies intake", min_value=0, max_value=10, value=3)
+flow = st.number_input("Flow", min_value=0, max_value=10, value=5)
 
-# Crear el diccionario original (sin dummificar)
+# Diccionario EXACTO como el dataset original
 user_input = {
     "GENDER": gender,
     "AGE": age,
     "DAILY_STRESS": stress,
     "SLEEP_HOURS": sleep_hours,
-    "PHYSICAL_ACTIVITY": exercise,
-    "HYDRATION": water,
-    "SCREEN_TIME": screen,
+    "DAILY_STEPS": daily_steps,
+    "FRUITS_VEGGIES": fruits,
+    "FLOW": flow,
 }
 
-# --------------------------
-# Función: procesamiento igual al entrenamiento
-# --------------------------
-def preprocess(df_raw: pd.DataFrame, schema_cols: list):
+# ------------------------------------------------------------
+# 3. Preprocesamiento igual que en entrenamiento
+# ------------------------------------------------------------
+def preprocess_input(df_raw: pd.DataFrame, schema_cols):
+
+    # One-Hot Encoding
     df_proc = pd.get_dummies(df_raw, drop_first=True)
 
-    # columnas faltantes → ponerlas en 0
+    # Agregar columnas faltantes
     for col in schema_cols:
         if col not in df_proc.columns:
             df_proc[col] = 0
 
-    # columnas extras → eliminarlas
+    # Ordenar
     df_proc = df_proc[schema_cols]
 
     return df_proc
 
-# --------------------------
-# Realizar predicción
-# --------------------------
-if st.button("🔮 Predecir"):
+
+# ------------------------------------------------------------
+# 4. Predicción
+# ------------------------------------------------------------
+if st.button("🔮 Predecir Score"):
     df_raw = pd.DataFrame([user_input])
-    df_ready = preprocess(df_raw, schema_cols)
+    df_ready = preprocess_input(df_raw, schema_cols)
 
     pred_raw = PIPE.predict(df_ready)[0]
     pred_final = float(np.clip(pred_raw, lower, upper))
 
-    st.success(f"🎯 Predicción Work-Life Balance Score: **{pred_final:.2f}**")
+    st.success(f"🎯 Work-Life Balance Score: **{pred_final:.2f}**")
 
-    st.write("📘 Detalles de la entrada procesada:")
-    st.dataframe(df_ready)
+    with st.expander("Ver datos procesados"):
+        st.dataframe(df_ready)
