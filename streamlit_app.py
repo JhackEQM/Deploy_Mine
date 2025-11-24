@@ -6,11 +6,11 @@ import json
 import os
 
 # =========================================
-# 1) Cargar artefactos
+# Cargar artefactos
 # =========================================
 ART_DIR = "artefactos"
 
-PIPE_PATH   = os.path.join(ART_DIR, "pipeline_RG.joblib")
+PIPE_PATH = os.path.join(ART_DIR, "pipeline_RG.joblib")
 SCHEMA_PATH = os.path.join(ART_DIR, "input_schema.json")
 POLICY_PATH = os.path.join(ART_DIR, "decision_policy.json")
 
@@ -19,19 +19,17 @@ INPUT_SCHEMA = json.load(open(SCHEMA_PATH, "r"))
 POLICY = json.load(open(POLICY_PATH, "r"))
 
 schema_cols = INPUT_SCHEMA["columns"]
-dtypes      = INPUT_SCHEMA["dtypes"]
+lower = POLICY["lower"]
+upper = POLICY["upper"]
 
-lower = POLICY.get("lower", None)
-upper = POLICY.get("upper", None)
-
-# =========================================
-# 2) UI
-# =========================================
 st.title("🔮 Work-Life Balance Predictor")
+st.write("Complete all the inputs below:")
 
-st.subheader("Completa los datos del usuario")
+# ===============================
+# SECCIÓN: VARIABLES CATEGÓRICAS
+# ===============================
+st.header("🧩 Información Personal")
 
-# 🟦 CATEGORÍAS QUE APRENDIÓ TU MODELO (100% REALES)
 gender = st.selectbox("Gender:", ["Female", "Male"])
 
 age = st.selectbox("Age group:", [
@@ -41,64 +39,112 @@ age = st.selectbox("Age group:", [
     "51 or more"
 ])
 
-daily_stress = st.selectbox("Daily Stress (categorías originales):", [
-    "0", "1", "1/1/00", "2", "3", "4", "5"
-])
+daily_stress = st.selectbox("Daily Stress (0–5):", ["0", "1", "2", "3", "4", "5"])
 
-# 🟩 VARIABLES NUMÉRICAS
-sleep_hours = st.number_input("Sleep Hours", 0.0, 12.0, 7.0)
-steps = st.number_input("Daily Steps", 0.0, 30000.0, 5000.0)
-exercise = st.number_input("Physical Activity (hours/week)", 0.0, 20.0, 3.0)
-water = st.number_input("Hydration (Liters/day)", 0.0, 5.0, 2.0)
-screen = st.number_input("Screen Time (Hours/day)", 0.0, 12.0, 4.0)
+# ===============================
+# SECCIÓN: HÁBITOS Y ESTILO DE VIDA
+# ===============================
+st.header("🏃 Hábitos y Estilo de Vida")
 
-# Diccionario EXACTO según schema del entrenamiento
+sleep_hours = st.number_input("Sleep Hours per Day", 0.0, 12.0, 7.0)
+daily_steps = st.number_input("Daily Steps", 0, 30000, 5000)
+physical_activity = st.number_input("Weekly Physical Activity (hours)", 0.0, 40.0, 5.0)
+hydration = st.number_input("Hydration (liters per day)", 0.0, 6.0, 2.0)
+screen_time = st.number_input("Screen Time (hours per day)", 0.0, 16.0, 4.0)
+weekly_meditation = st.number_input("Meditation (times per week)", 0, 14, 2)
+time_for_passion = st.number_input("Time for Passion Projects (1–5)", 1, 5, 3)
+
+# ===============================
+# SECCIÓN: RELACIONES SOCIALES
+# ===============================
+st.header("🤝 Relaciones Sociales")
+
+fruits = st.number_input("Fruits & Veggies Servings", 0, 10, 4)
+places = st.number_input("Places Visited per Month", 0, 20, 3)
+core_circle = st.number_input("Core Circle (Close friends)", 0, 20, 5)
+supporting_others = st.number_input("Supporting Others (1–5)", 1, 5, 3)
+social_network = st.number_input("Social Network Strength (1–5)", 1, 5, 3)
+
+# ===============================
+# SECCIÓN: LOGROS / PRODUCTIVIDAD
+# ===============================
+st.header("🏆 Logros y Productividad")
+
+achievement = st.number_input("Achievement (0–5)", 0, 5, 2)
+donation = st.number_input("Donations per Month", 0, 10, 1)
+bmi_range = st.number_input("BMI Range Category (1–5)", 1, 5, 2)
+todo_completed = st.number_input("Daily TODO Completion (1–5)", 1, 5, 3)
+flow = st.number_input("Flow State Frequency (1–5)", 1, 5, 2)
+lost_vacation = st.number_input("Lost Vacation Days", 0, 60, 5)
+daily_shouting = st.number_input("Daily Shouting Frequency (1–5)", 1, 5, 1)
+sufficient_income = st.number_input("Income Satisfaction (1–5)", 1, 5, 3)
+personal_awards = st.number_input("Personal Awards (0–10)", 0, 10, 1)
+live_vision = st.number_input("Life Vision Clarity (1–5)", 1, 5, 3)
+
+# ================================================
+# Crear el diccionario EXACTO que el modelo espera
+# ================================================
 user_input = {
-    "GENDER": gender,
-    "AGE": age,
+    "FRUITS_VEGGIES": fruits,
     "DAILY_STRESS": daily_stress,
+    "PLACES_VISITED": places,
+    "CORE_CIRCLE": core_circle,
+    "SUPPORTING_OTHERS": supporting_others,
+    "SOCIAL_NETWORK": social_network,
+    "ACHIEVEMENT": achievement,
+    "DONATION": donation,
+    "BMI_RANGE": bmi_range,
+    "TODO_COMPLETED": todo_completed,
+    "FLOW": flow,
+    "DAILY_STEPS": daily_steps,
+    "LIVE_VISION": live_vision,
     "SLEEP_HOURS": sleep_hours,
-    "DAILY_STEPS": steps,
-    "PHYSICAL_ACTIVITY": exercise,
-    "HYDRATION": water,
-    "SCREEN_TIME": screen,
+    "LOST_VACATION": lost_vacation,
+    "DAILY_SHOUTING": daily_shouting,
+    "SUFFICIENT_INCOME": sufficient_income,
+    "PERSONAL_AWARDS": personal_awards,
+    "TIME_FOR_PASSION": time_for_passion,
+    "WEEKLY_MEDITATION": weekly_meditation,
+    "AGE": age,
+    "GENDER": gender,
+    "PHYSICAL_ACTIVITY": physical_activity,
+    "HYDRATION": hydration,
+    "SCREEN_TIME": screen_time
 }
 
 # =========================================
-# 3) Preprocesamiento igual al entrenamiento
+# Alineación EXACTA al schema
 # =========================================
-def coerce_and_align(df_raw, schema_cols, dtypes):
+def align(df_raw, schema):
     df = df_raw.copy()
+    cols = schema["columns"]
+    dtypes = schema["dtypes"]
 
-    # Agregar columnas faltantes
-    for c in schema_cols:
-        if c not in df.columns:
-            df[c] = np.nan
+    for col in cols:
+        if col not in df:
+            df[col] = np.nan
 
-    # Convertir tipos según el esquema
-    for c in schema_cols:
-        dtype = dtypes[c]
-        if dtype.startswith(("int", "float")):
-            df[c] = pd.to_numeric(df[c], errors="coerce")
+    for col in cols:
+        t = str(dtypes[col])
+        if "int" in t or "float" in t:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
         else:
-            df[c] = df[c].astype("string").str.strip()
+            df[col] = df[col].astype("string")
 
-    return df[schema_cols]
+    return df[cols]
+
 
 # =========================================
-# 4) Predicción
+# PREDICCIÓN
 # =========================================
 if st.button("🔮 Predecir"):
     df_raw = pd.DataFrame([user_input])
-
-    df_clean = coerce_and_align(df_raw, schema_cols, dtypes)
+    df_clean = align(df_raw, INPUT_SCHEMA)
 
     pred_raw = PIPE.predict(df_clean)[0]
-
-    # Aplicar política
     pred_final = float(np.clip(pred_raw, lower, upper))
 
     st.success(f"🎯 Predicción Work-Life Balance Score: **{pred_final:.2f}**")
 
-    st.write("📘 Datos enviados al modelo (ya alineados):")
+    st.write("📘 Entrada procesada:")
     st.dataframe(df_clean)
