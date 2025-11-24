@@ -5,61 +5,55 @@ import joblib
 import json
 import os
 
-# --------------------------
-# Cargar artefactos
-# --------------------------
+# ================================
+# CARGAR ARTEFACTOS
+# ================================
 ART_DIR = "artefactos"
 
-SCHEMA_PATH = os.path.join(ART_DIR, "input_schema.json")
-POLICY_PATH = os.path.join(ART_DIR, "decision_policy.json")
-
-INPUT_SCHEMA = json.load(open(SCHEMA_PATH, "r"))
-POLICY = json.load(open(POLICY_PATH, "r"))
-
-WINNER = POLICY["winner"]
-PIPE = joblib.load(os.path.join(ART_DIR, f"pipeline_{WINNER}.joblib"))
+PIPE = joblib.load(os.path.join(ART_DIR, "pipeline_RG.joblib"))
+INPUT_SCHEMA = json.load(open(os.path.join(ART_DIR, "input_schema.json"), "r"))
+POLICY = json.load(open(os.path.join(ART_DIR, "decision_policy.json"), "r"))
 
 schema_cols = INPUT_SCHEMA["columns"]
-lower = POLICY["lower"]
-upper = POLICY["upper"]
+lower = POLICY.get("lower")
+upper = POLICY.get("upper")
 
-
-st.title("🔮 Predicción Work-Life Balance Score")
+st.title("💼 Predicción de Work-Life Balance (WLB)")
 st.subheader("Completa los datos del usuario")
 
 
-# --------------------------
-# VARIABLES REALES DEL DATASET
-# --------------------------
-
+# ================================
+# VARIABLES DEL DATASET REAL
+# ================================
 gender = st.selectbox("Gender:", ["Male", "Female"])
 age = st.selectbox("Age group:", ["Less than 20", "21 to 35", "36 to 50", "51 or more"])
-stress = st.selectbox("Daily Stress (1–5):", [0,1,2,3,4,5])
+stress = st.selectbox("Daily Stress (0–5):", [0,1,2,3,4,5])
 
 sleep = st.slider("Sleep Hours", 0, 12, 7)
-steps = st.number_input("Daily Steps", 0, 30000, 7000)
+steps = st.slider("Daily Steps", 0, 20000, 7000)
 fruits = st.slider("Fruits & Veggies Intake", 0, 10, 3)
 flow = st.slider("Flow", 0, 10, 5)
 
-lost_vacation = st.slider("Lost Vacation", 0,10,0)
-live_vision = st.slider("Live Vision", 0,10,5)
-supporting = st.slider("Supporting Others", 0,10,5)
-personal_awards = st.slider("Personal Awards", 0,10,1)
-donation = st.slider("Donation", 0,10,2)
-achievement = st.slider("Achievement", 0,10,3)
-core_circle = st.slider("Core Circle", 0,10,5)
-social_network = st.slider("Social Network", 0,10,5)
-weekly_med = st.slider("Weekly Meditation", 0,10,2)
-todo_completed = st.slider("Todo Completed", 0,10,5)
-bmi_range = st.slider("BMI Range", 0,10,2)
-sufficient_income = st.slider("Sufficient Income", 0,10,3)
-places_visited = st.slider("Places Visited", 0,10,4)
-daily_shouting = st.slider("Daily Shouting", 0,10,0)
+lost_vac = st.slider("Lost Vacation", 0, 10, 0)
+live_vision = st.slider("Live Vision", 0, 10, 5)
+supporting = st.slider("Supporting Others", 0, 10, 4)
+awards = st.slider("Personal Awards", 0, 10, 1)
+donation = st.slider("Donation", 0, 10, 2)
+achievement = st.slider("Achievement", 0, 10, 3)
+core = st.slider("Core Circle", 0, 10, 5)
+social = st.slider("Social Network", 0, 10, 5)
+weekly_med = st.slider("Weekly Meditation", 0, 10, 2)
+todo = st.slider("Todo Completed", 0, 10, 4)
+bmi = st.slider("BMI Range", 0, 10, 2)
+income = st.slider("Sufficient Income", 0, 10, 4)
+places = st.slider("Places Visited", 0, 10, 3)
+shouting = st.slider("Daily Shouting", 0, 10, 0)
+passion = st.slider("Time for Passion", 0, 10, 3)
 
-# --------------------------
-# CREAR INPUT COMPLETO
-# --------------------------
 
+# ================================
+# ENSAMBLAR INPUT
+# ================================
 user_input = {
     "GENDER": gender,
     "AGE": age,
@@ -68,48 +62,51 @@ user_input = {
     "DAILY_STEPS": steps,
     "FRUITS_VEGGIES": fruits,
     "FLOW": flow,
-    "LOST_VACATION": lost_vacation,
+    "LOST_VACATION": lost_vac,
     "LIVE_VISION": live_vision,
     "SUPPORTING_OTHERS": supporting,
-    "PERSONAL_AWARDS": personal_awards,
+    "PERSONAL_AWARDS": awards,
     "DONATION": donation,
     "ACHIEVEMENT": achievement,
-    "CORE_CIRCLE": core_circle,
-    "SOCIAL_NETWORK": social_network,
+    "CORE_CIRCLE": core,
+    "SOCIAL_NETWORK": social,
     "WEEKLY_MEDITATION": weekly_med,
-    "TODO_COMPLETED": todo_completed,
-    "BMI_RANGE": bmi_range,
-    "SUFFICIENT_INCOME": sufficient_income,
-    "PLACES_VISITED": places_visited,
-    "DAILY_SHOUTING": daily_shouting,
+    "TODO_COMPLETED": todo,
+    "BMI_RANGE": bmi,
+    "SUFFICIENT_INCOME": income,
+    "PLACES_VISITED": places,
+    "DAILY_SHOUTING": shouting,
+    "TIME_FOR_PASSION": passion
 }
 
-# --------------------------
-# FUNCIONES
-# --------------------------
 
-def preprocess(df_raw, schema_cols):
-    df_proc = pd.get_dummies(df_raw, drop_first=True)
+# ================================
+# PREPROCESS
+# ================================
+def preprocess_raw(df_raw, schema):
+    df = pd.DataFrame(df_raw)
 
-    for col in schema_cols:
-        if col not in df_proc.columns:
-            df_proc[col] = 0
+    # OHE automático por pipeline → NO aplicar get_dummies
+    for col in df.columns:
+        if df[col].dtype == "object":
+            df[col] = df[col].astype("string").str.strip()
 
-    df_proc = df_proc[schema_cols]
-    return df_proc
+    for col in schema:
+        if col not in df.columns:
+            df[col] = np.nan
+
+    return df[schema]
 
 
-# --------------------------
+# ================================
 # PREDICCIÓN
-# --------------------------
-
+# ================================
 if st.button("🔮 Predecir Score"):
-    df = pd.DataFrame([user_input])
-    df_clean = preprocess(df, schema_cols)
+    df_clean = preprocess_raw([user_input], schema_cols)
 
     pred = PIPE.predict(df_clean)[0]
     pred = float(np.clip(pred, lower, upper))
 
-    st.success(f"Score estimado: **{pred:.2f}**")
-    st.write("📘 Entrada procesada:")
+    st.success(f"🎯 Work-Life Balance Score: **{pred:.2f}**")
+    st.write("📘 Datos procesados:")
     st.dataframe(df_clean)
