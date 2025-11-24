@@ -1,0 +1,7 @@
+{
+    "clip_to_train_range": true,
+    "round_to_int": false,
+    "lower": 480.0,
+    "upper": 820.2,
+    "winner": "LR"
+}
