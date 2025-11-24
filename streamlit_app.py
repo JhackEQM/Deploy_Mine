@@ -1,82 +1,82 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import json, joblib
+import joblib
+import json
 import os
 
-# ============================
-# 1) Cargar artefactos
-# ============================
-
+# --------------------------
+# Cargar artefactos
+# --------------------------
 ART_DIR = "artefactos"
 
-PIPE_PATH = os.path.join(ART_DIR, "pipeline_MLP.joblib")
+PIPE_PATH = os.path.join(ART_DIR, "pipeline_LR.joblib")  # o pipeline_RG.joblib
 SCHEMA_PATH = os.path.join(ART_DIR, "input_schema.json")
 POLICY_PATH = os.path.join(ART_DIR, "decision_policy.json")
 
 PIPE = joblib.load(PIPE_PATH)
-INPUT_SCHEMA = json.load(open(SCHEMA_PATH, "r", encoding="utf-8"))
-POLICY = json.load(open(POLICY_PATH, "r", encoding="utf-8"))
+INPUT_SCHEMA = json.load(open(SCHEMA_PATH, "r"))
+POLICY = json.load(open(POLICY_PATH, "r"))
 
-FEATURES = INPUT_SCHEMA["columns"]
-DTYPES = INPUT_SCHEMA["dtypes"]
+schema_cols = INPUT_SCHEMA["columns"]
+lower = POLICY["lower"]
+upper = POLICY["upper"]
 
+st.title("🔮 Predicción Work-Life Balance")
 
-# ============================
-# 2) Funciones auxiliares
-# ============================
+# --------------------------
+# Entrada de datos del usuario
+# --------------------------
 
-def _coerce_and_align(df):
-    """Alinea columnas y convierte tipos según el esquema de entrenamiento."""
-    for c in FEATURES:
-        if c not in df.columns:
-            df[c] = np.nan
+st.subheader("Completa los datos")
 
-        t = str(DTYPES[c]).lower()
+gender = st.selectbox("Gender:", ["Male", "Female"])
+age = st.selectbox("Age group:", ["18-25", "26-33", "34-41", "42-49", "50-57", "58+"])
+stress = st.selectbox("Daily Stress:", ["Low", "Medium", "High"])
 
-        if t.startswith(("int", "float")):
-            df[c] = pd.to_numeric(df[c], errors="coerce")
-        else:
-            df[c] = df[c].astype("string").str.strip()
+sleep_hours = st.number_input("Hours of Sleep per Day", 0.0, 12.0, 7.0)
+exercise = st.number_input("Exercise Hours Per Week", 0.0, 20.0, 3.0)
+water = st.number_input("Daily Water Intake (Liters)", 0.0, 5.0, 2.0)
+screen = st.number_input("Daily Screen Time (Hours)", 0.0, 12.0, 4.0)
 
-    return df[FEATURES]
+# Crear el diccionario original (sin dummificar)
+user_input = {
+    "GENDER": gender,
+    "AGE": age,
+    "DAILY_STRESS": stress,
+    "SLEEP_HOURS": sleep_hours,
+    "PHYSICAL_ACTIVITY": exercise,
+    "HYDRATION": water,
+    "SCREEN_TIME": screen,
+}
 
+# --------------------------
+# Función: procesamiento igual al entrenamiento
+# --------------------------
+def preprocess(df_raw: pd.DataFrame, schema_cols: list):
+    df_proc = pd.get_dummies(df_raw, drop_first=True)
 
-def predict_single(record: dict):
-    df = pd.DataFrame([record])
-    df = _coerce_and_align(df)
-    
-    yhat = PIPE.predict(df)
+    # columnas faltantes → ponerlas en 0
+    for col in schema_cols:
+        if col not in df_proc.columns:
+            df_proc[col] = 0
 
-    lower = POLICY.get("lower", float(np.min(yhat)))
-    upper = POLICY.get("upper", float(np.max(yhat)))
-    
-    ypp = float(np.clip(yhat[0], lower, upper))
-    return ypp
+    # columnas extras → eliminarlas
+    df_proc = df_proc[schema_cols]
 
+    return df_proc
 
-# ============================
-# 3) Interfaz Streamlit
-# ============================
+# --------------------------
+# Realizar predicción
+# --------------------------
+if st.button("🔮 Predecir"):
+    df_raw = pd.DataFrame([user_input])
+    df_ready = preprocess(df_raw, schema_cols)
 
-st.title("🧠 Predicción de Work-Life Balance")
-st.write("Ingrese los parámetros de estilo de vida para predecir el puntaje de bienestar laboral/personal.")
+    pred_raw = PIPE.predict(df_ready)[0]
+    pred_final = float(np.clip(pred_raw, lower, upper))
 
-user_inputs = {}
+    st.success(f"🎯 Predicción Work-Life Balance Score: **{pred_final:.2f}**")
 
-# Crear widgets según el esquema
-for col in FEATURES:
-    t = str(DTYPES[col]).lower()
-
-    if t.startswith("int") or t.startswith("float"):
-        user_inputs[col] = st.number_input(col, value=0.0)
-    else:
-        user_inputs[col] = st.text_input(col, "")
-
-# ============================
-# 4) Botón para predecir
-# ============================
-
-if st.button("Predecir"):
-    pred = predict_single(user_inputs)
-    st.success(f"🎯 Predicción estimada del Work-Life Balance Score: **{pred:.2f}**")
+    st.write("📘 Detalles de la entrada procesada:")
+    st.dataframe(df_ready)
