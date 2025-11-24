@@ -1,0 +1,12 @@
+{
+  "clip_to_train_range": true,
+  "round_to_int": false,
+  "lower": 480.0,
+  "upper": 820.2,
+  "winner": "RG",
+  "test_metrics": {
+    "MAE": 2.6845166662080605e-05,
+    "RMSE": 3.825426038434904e-05,
+    "R2": 0.9999999999992634
+  }
+}
