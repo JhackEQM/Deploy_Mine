@@ -39,47 +39,47 @@ age = st.selectbox("Age group:", [
     "51 or more"
 ])
 
-daily_stress = st.selectbox("Daily Stress (0–5):", ["0", "1", "2", "3", "4", "5"])
+daily_stress = st.slider("Daily Stress (0–5):", 0, 5, 2)
 
 # ===============================
 # SECCIÓN: HÁBITOS Y ESTILO DE VIDA
 # ===============================
 st.header("🏃 Hábitos y Estilo de Vida")
 
-sleep_hours = st.number_input("Sleep Hours per Day", 0.0, 12.0, 7.0)
-daily_steps = st.number_input("Daily Steps", 0, 30000, 5000)
-physical_activity = st.number_input("Weekly Physical Activity (hours)", 0.0, 40.0, 5.0)
-hydration = st.number_input("Hydration (liters per day)", 0.0, 6.0, 2.0)
-screen_time = st.number_input("Screen Time (hours per day)", 0.0, 16.0, 4.0)
-weekly_meditation = st.number_input("Meditation (times per week)", 0, 14, 2)
-time_for_passion = st.number_input("Time for Passion Projects (1–5)", 1, 5, 3)
+sleep_hours = st.slider("Sleep Hours per Day", 0.0, 12.0, 7.0)
+daily_steps = st.slider("Daily Steps", 0, 30000, 5000)
+physical_activity = st.slider("Weekly Physical Activity (hours)", 0.0, 40.0, 5.0)
+hydration = st.slider("Hydration (liters per day)", 0.0, 6.0, 2.0)
+screen_time = st.slider("Screen Time (hours per day)", 0.0, 16.0, 4.0)
+weekly_meditation = st.slider("Meditation (times per week)", 0, 14, 2)
+time_for_passion = st.slider("Time for Passion Projects (1–5)", 1, 5, 3)
 
 # ===============================
 # SECCIÓN: RELACIONES SOCIALES
 # ===============================
 st.header("🤝 Relaciones Sociales")
 
-fruits = st.number_input("Fruits & Veggies Servings", 0, 10, 4)
-places = st.number_input("Places Visited per Month", 0, 20, 3)
-core_circle = st.number_input("Core Circle (Close friends)", 0, 20, 5)
-supporting_others = st.number_input("Supporting Others (1–5)", 1, 5, 3)
-social_network = st.number_input("Social Network Strength (1–5)", 1, 5, 3)
+fruits = st.slider("Fruits & Veggies Servings", 0, 10, 4)
+places = st.slider("Places Visited per Month", 0, 20, 3)
+core_circle = st.slider("Core Circle (Close friends)", 0, 20, 5)
+supporting_others = st.slider("Supporting Others (1–5)", 1, 5, 3)
+social_network = st.slider("Social Network Strength (1–5)", 1, 5, 3)
 
 # ===============================
 # SECCIÓN: LOGROS / PRODUCTIVIDAD
 # ===============================
 st.header("🏆 Logros y Productividad")
 
-achievement = st.number_input("Achievement (0–5)", 0, 5, 2)
-donation = st.number_input("Donations per Month", 0, 10, 1)
-bmi_range = st.number_input("BMI Range Category (1–5)", 1, 5, 2)
-todo_completed = st.number_input("Daily TODO Completion (1–5)", 1, 5, 3)
-flow = st.number_input("Flow State Frequency (1–5)", 1, 5, 2)
-lost_vacation = st.number_input("Lost Vacation Days", 0, 60, 5)
-daily_shouting = st.number_input("Daily Shouting Frequency (1–5)", 1, 5, 1)
-sufficient_income = st.number_input("Income Satisfaction (1–5)", 1, 5, 3)
-personal_awards = st.number_input("Personal Awards (0–10)", 0, 10, 1)
-live_vision = st.number_input("Life Vision Clarity (1–5)", 1, 5, 3)
+achievement = st.slider("Achievement (0–5)", 0, 5, 2)
+donation = st.slider("Donations per Month", 0, 10, 1)
+bmi_range = st.slider("BMI Range Category (1–5)", 1, 5, 2)
+todo_completed = st.slider("Daily TODO Completion (1–5)", 1, 5, 3)
+flow = st.slider("Flow State Frequency (1–5)", 1, 5, 2)
+lost_vacation = st.slider("Lost Vacation Days", 0, 60, 5)
+daily_shouting = st.slider("Daily Shouting Frequency (1–5)", 1, 5, 1)
+sufficient_income = st.slider("Income Satisfaction (1–5)", 1, 5, 3)
+personal_awards = st.slider("Personal Awards (0–10)", 0, 10, 1)
+live_vision = st.slider("Life Vision Clarity (1–5)", 1, 5, 3)
 
 # ================================================
 # Crear el diccionario EXACTO que el modelo espera
