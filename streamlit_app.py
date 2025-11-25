@@ -24,69 +24,71 @@ PIPE = joblib.load(PIPE_PATH)
 INPUT_SCHEMA = json.load(open(SCHEMA_PATH, "r"))
 POLICY = json.load(open(POLICY_PATH, "r"))
 
-schema_cols = INPUT_SCHEMA["columns"]
-lower = POLICY["lower"]
-upper = POLICY["upper"]
+# Cambiar rango a 0–1000
+lower = 0
+upper = 1000
 
-st.title("🔮 Work-Life Balance Predictor")
-st.write("Complete all the inputs below:")
+schema_cols = INPUT_SCHEMA["columns"]
+
+st.title("🔮 Predictor de Equilibrio Vida–Trabajo")
+st.write("Completa todos los campos para obtener una predicción:")
 
 # ===============================
 # SECCIÓN: VARIABLES CATEGÓRICAS
 # ===============================
 st.header("🧩 Información Personal")
 
-gender = st.selectbox("Gender:", ["Female", "Male"])
+gender = st.selectbox("Género:", ["Female", "Male"])
 
-age = st.selectbox("Age group:", [
+age = st.selectbox("Grupo de edad:", [
     "Less than 20",
     "21 to 35",
     "36 to 50",
     "51 or more"
 ])
 
-daily_stress = st.slider("Daily Stress (0–5):", 0, 5, 2)
+daily_stress = st.slider("Estrés diario (0–5):", 0, 5, 2)
 
 # ===============================
 # SECCIÓN: HÁBITOS Y ESTILO DE VIDA
 # ===============================
 st.header("🏃 Hábitos y Estilo de Vida")
 
-sleep_hours = st.number_input("Sleep Hours per Day", 0.0, 12.0, 7.0)
-daily_steps = st.number_input("Daily Steps", 0, 30000, 5000)
-physical_activity = st.number_input("Weekly Physical Activity (hours)", 0.0, 40.0, 5.0)
-hydration = st.number_input("Hydration (liters per day)", 0.0, 6.0, 2.0)
-screen_time = st.number_input("Screen Time (hours per day)", 0.0, 16.0, 4.0)
+sleep_hours = st.number_input("Horas de sueño por día", 0.0, 12.0, 7.0)
+daily_steps = st.number_input("Pasos diarios", 0, 30000, 5000)
+physical_activity = st.number_input("Actividad física semanal (horas)", 0.0, 40.0, 5.0)
+hydration = st.number_input("Hidratación (litros por día)", 0.0, 6.0, 2.0)
+screen_time = st.number_input("Horas frente a pantallas por día", 0.0, 16.0, 4.0)
 
-weekly_meditation = st.slider("Meditation (times per week)", 0, 14, 2)
-time_for_passion = st.slider("Time for Passion Projects (1–5)", 1, 5, 3)
+weekly_meditation = st.slider("Meditación (veces por semana)", 0, 14, 2)
+time_for_passion = st.slider("Tiempo para proyectos personales (1–5)", 1, 5, 3)
 
 # ===============================
 # SECCIÓN: RELACIONES SOCIALES
 # ===============================
 st.header("🤝 Relaciones Sociales")
 
-fruits = st.slider("Fruits & Veggies Servings", 0, 10, 4)
-places = st.slider("Places Visited per Month", 0, 20, 3)
-core_circle = st.slider("Core Circle (Close friends)", 0, 20, 5)
-supporting_others = st.slider("Supporting Others (1–5)", 1, 5, 3)
-social_network = st.slider("Social Network Strength (1–5)", 1, 5, 3)
+fruits = st.slider("Porciones de frutas y verduras", 0, 10, 4)
+places = st.slider("Lugares visitados por mes", 0, 20, 3)
+core_circle = st.slider("Círculo cercano (amigos íntimos)", 0, 20, 5)
+supporting_others = st.slider("Apoyo a otros (1–5)", 1, 5, 3)
+social_network = st.slider("Red social (1–5)", 1, 5, 3)
 
 # ===============================
 # SECCIÓN: LOGROS / PRODUCTIVIDAD
 # ===============================
 st.header("🏆 Logros y Productividad")
 
-achievement = st.slider("Achievement (0–5)", 0, 5, 2)
-donation = st.slider("Donations per Month", 0, 10, 1)
-bmi_range = st.slider("BMI Range Category (1–5)", 1, 5, 2)
-todo_completed = st.slider("Daily TODO Completion (1–5)", 1, 5, 3)
-flow = st.slider("Flow State Frequency (1–5)", 1, 5, 2)
-lost_vacation = st.slider("Lost Vacation Days", 0, 60, 5)
-daily_shouting = st.slider("Daily Shouting Frequency (1–5)", 1, 5, 1)
-sufficient_income = st.slider("Income Satisfaction (1–5)", 1, 5, 3)
-personal_awards = st.slider("Personal Awards (0–10)", 0, 10, 1)
-live_vision = st.slider("Life Vision Clarity (1–5)", 1, 5, 3)
+achievement = st.slider("Logro personal (0–5)", 0, 5, 2)
+donation = st.slider("Donaciones por mes", 0, 10, 1)
+bmi_range = st.slider("Categoría de IMC (1–5)", 1, 5, 2)
+todo_completed = st.slider("Tareas completadas diariamente (1–5)", 1, 5, 3)
+flow = st.slider("Estado de flow (1–5)", 1, 5, 2)
+lost_vacation = st.slider("Días de vacaciones perdidos", 0, 60, 5)
+daily_shouting = st.slider("Frecuencia de gritos diarios (1–5)", 1, 5, 1)
+sufficient_income = st.slider("Satisfacción con los ingresos (1–5)", 1, 5, 3)
+personal_awards = st.slider("Premios personales (0–10)", 0, 10, 1)
+live_vision = st.slider("Claridad de visión de vida (1–5)", 1, 5, 3)
 
 # ================================================
 # Crear diccionario EXACTO que el modelo espera
@@ -152,11 +154,11 @@ if st.button("🔮 Predecir"):
 
     # Guardar en historial
     st.session_state["history"].append({
-        "prediction": pred_final,
+        "Predicción": pred_final,
         **user_input
     })
 
-    st.success(f"🎯 Predicción Work-Life Balance Score: **{pred_final:.2f}**")
+    st.success(f"🎯 Puntaje estimado de Equilibrio Vida–Trabajo: **{pred_final:.2f}**")
 
     st.write("📘 Entrada procesada:")
     st.dataframe(df_clean)
