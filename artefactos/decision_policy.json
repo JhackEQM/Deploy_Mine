@@ -1,8 +1,8 @@
 {
   "clip_to_train_range": true,
   "round_to_int": false,
-  "lower": 480.0,
-  "upper": 820.2,
+  "lower": 0,
+  "upper": 1000,
   "winner": "RG",
   "test_metrics": {
     "MAE": 2.6845166662080605e-05,
