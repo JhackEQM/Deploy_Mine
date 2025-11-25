@@ -38,57 +38,95 @@ st.write("Completa todos los campos para obtener una predicción:")
 # ===============================
 st.header("🧩 Información Personal")
 
-gender = st.selectbox("Género:", ["Female", "Male"])
+# GENDER: 'Female'
+gender = st.selectbox("Género:", ["Female", "Male"], index=0)
 
-age = st.selectbox("Grupo de edad:", [
-    "Less than 20",
-    "21 to 35",
-    "36 to 50",
-    "51 or more"
-])
+# AGE: '36 to 50'
+age = st.selectbox(
+    "Grupo de edad:",
+    ["Less than 20", "21 to 35", "36 to 50", "51 or more"],
+    index=2  # '36 to 50'
+)
 
-daily_stress = st.slider("Estrés diario (0–5):", 0, 5, 2)
+# DAILY_STRESS: '5' → slider en 5
+daily_stress = st.slider("Estrés diario (0–5):", 0, 5, 5)
 
 # ===============================
 # SECCIÓN: HÁBITOS Y ESTILO DE VIDA
 # ===============================
 st.header("🏃 Hábitos y Estilo de Vida")
 
-sleep_hours = st.number_input("Horas de sueño por día", 0.0, 12.0, 7.0)
-daily_steps = st.number_input("Pasos diarios", 0, 30000, 5000)
-physical_activity = st.number_input("Actividad física semanal (horas)", 0.0, 40.0, 5.0)
-hydration = st.number_input("Hidratación (litros por día)", 0.0, 6.0, 2.0)
-screen_time = st.number_input("Horas frente a pantallas por día", 0.0, 16.0, 4.0)
+# SLEEP_HOURS: 6
+sleep_hours = st.number_input("Horas de sueño por día", 0.0, 12.0, 6.0)
 
-weekly_meditation = st.slider("Meditación (veces por semana)", 0, 14, 2)
-time_for_passion = st.slider("Tiempo para proyectos personales (1–5)", 1, 5, 3)
+# DAILY_STEPS: 10
+daily_steps = st.number_input("Pasos diarios", 0, 30000, 10)
+
+# En el ejemplo no hay valor para estos → los dejamos en 0 por defecto
+physical_activity = st.number_input("Actividad física semanal (horas)", 0.0, 40.0, 0.0)
+hydration = st.number_input("Hidratación (litros por día)", 0.0, 6.0, 0.0)
+screen_time = st.number_input("Horas frente a pantallas por día", 0.0, 16.0, 0.0)
+
+# WEEKLY_MEDITATION: 5
+weekly_meditation = st.slider("Meditación (veces por semana)", 0, 14, 5)
+
+# TIME_FOR_PASSION: 1
+time_for_passion = st.slider("Tiempo para proyectos personales (1–5)", 1, 5, 1)
 
 # ===============================
 # SECCIÓN: RELACIONES SOCIALES
 # ===============================
 st.header("🤝 Relaciones Sociales")
 
+# FRUITS_VEGGIES: 4
 fruits = st.slider("Porciones de frutas y verduras", 0, 10, 4)
-places = st.slider("Lugares visitados por mes", 0, 20, 3)
-core_circle = st.slider("Círculo cercano (amigos íntimos)", 0, 20, 5)
-supporting_others = st.slider("Apoyo a otros (1–5)", 1, 5, 3)
-social_network = st.slider("Red social (1–5)", 1, 5, 3)
+
+# PLACES_VISITED: 4
+places = st.slider("Lugares visitados por mes", 0, 20, 4)
+
+# CORE_CIRCLE: 6
+core_circle = st.slider("Círculo cercano (amigos íntimos)", 0, 20, 6)
+
+# SUPPORTING_OTHERS: 5
+supporting_others = st.slider("Apoyo a otros (1–5)", 1, 5, 5)
+
+# SOCIAL_NETWORK: 5
+social_network = st.slider("Red social (1–5)", 1, 5, 5)
 
 # ===============================
 # SECCIÓN: LOGROS / PRODUCTIVIDAD
 # ===============================
 st.header("🏆 Logros y Productividad")
 
-achievement = st.slider("Logro personal (0–5)", 0, 5, 2)
-donation = st.slider("Donaciones por mes", 0, 10, 1)
+# ACHIEVEMENT: 0
+achievement = st.slider("Logro personal (0–5)", 0, 5, 0)
+
+# DONATION: 5
+donation = st.slider("Donaciones por mes", 0, 10, 5)
+
+# BMI_RANGE: 2
 bmi_range = st.slider("Categoría de IMC (1–5)", 1, 5, 2)
-todo_completed = st.slider("Tareas completadas diariamente (1–5)", 1, 5, 3)
+
+# TODO_COMPLETED: 4
+todo_completed = st.slider("Tareas completadas diariamente (1–5)", 1, 5, 4)
+
+# FLOW: 2
 flow = st.slider("Estado de flow (1–5)", 1, 5, 2)
+
+# LOST_VACATION: 5
 lost_vacation = st.slider("Días de vacaciones perdidos", 0, 60, 5)
+
+# DAILY_SHOUTING: 1
 daily_shouting = st.slider("Frecuencia de gritos diarios (1–5)", 1, 5, 1)
-sufficient_income = st.slider("Satisfacción con los ingresos (1–5)", 1, 5, 3)
-personal_awards = st.slider("Premios personales (0–10)", 0, 10, 1)
-live_vision = st.slider("Claridad de visión de vida (1–5)", 1, 5, 3)
+
+# SUFFICIENT_INCOME: 2
+sufficient_income = st.slider("Satisfacción con los ingresos (1–5)", 1, 5, 2)
+
+# PERSONAL_AWARDS: 5
+personal_awards = st.slider("Premios personales (0–10)", 0, 10, 5)
+
+# LIVE_VISION: 2
+live_vision = st.slider("Claridad de visión de vida (1–5)", 1, 5, 2)
 
 # ================================================
 # Crear diccionario EXACTO que el modelo espera
