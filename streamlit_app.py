@@ -39,6 +39,7 @@ age = st.selectbox("Age group:", [
     "51 or more"
 ])
 
+# 0–5 → SLIDER
 daily_stress = st.slider("Daily Stress (0–5):", 0, 5, 2)
 
 # ===============================
@@ -46,11 +47,12 @@ daily_stress = st.slider("Daily Stress (0–5):", 0, 5, 2)
 # ===============================
 st.header("🏃 Hábitos y Estilo de Vida")
 
-sleep_hours = st.slider("Sleep Hours per Day", 0.0, 12.0, 7.0)
-daily_steps = st.slider("Daily Steps", 0, 30000, 5000)
-physical_activity = st.slider("Weekly Physical Activity (hours)", 0.0, 40.0, 5.0)
-hydration = st.slider("Hydration (liters per day)", 0.0, 6.0, 2.0)
-screen_time = st.slider("Screen Time (hours per day)", 0.0, 16.0, 4.0)
+sleep_hours = st.number_input("Sleep Hours per Day", 0.0, 12.0, 7.0)
+daily_steps = st.number_input("Daily Steps", 0, 30000, 5000)
+physical_activity = st.number_input("Weekly Physical Activity (hours)", 0.0, 40.0, 5.0)
+hydration = st.number_input("Hydration (liters per day)", 0.0, 6.0, 2.0)
+screen_time = st.number_input("Screen Time (hours per day)", 0.0, 16.0, 4.0)
+
 weekly_meditation = st.slider("Meditation (times per week)", 0, 14, 2)
 time_for_passion = st.slider("Time for Passion Projects (1–5)", 1, 5, 3)
 
@@ -132,7 +134,6 @@ def align(df_raw, schema):
             df[col] = df[col].astype("string")
 
     return df[cols]
-
 
 # =========================================
 # PREDICCIÓN
