@@ -197,6 +197,10 @@ if st.button("🔮 Predecir"):
     })
 
     st.success(f"🎯 Puntaje estimado de Equilibrio Vida–Trabajo: **{pred_final:.2f}**")
+    # Probabilidad basada en el rango 0–1000
+    prob = pred_final / 1000
+    st.info(f"🔢 Probabilidad estimada de bienestar: **{prob*100:.2f}%**")
+
 
     st.write("📘 Entrada procesada:")
     st.dataframe(df_clean)
