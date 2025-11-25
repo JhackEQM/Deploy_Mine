@@ -149,9 +149,6 @@ user_input = {
     "WEEKLY_MEDITATION": weekly_meditation,
     "AGE": age,
     "GENDER": gender,
-    "PHYSICAL_ACTIVITY": physical_activity,
-    "HYDRATION": hydration,
-    "SCREEN_TIME": screen_time
 }
 
 # =========================================
