@@ -6,6 +6,12 @@ import json
 import os
 
 # =========================================
+# Inicializar historial persistente
+# =========================================
+if "history" not in st.session_state:
+    st.session_state["history"] = []
+
+# =========================================
 # Cargar artefactos
 # =========================================
 ART_DIR = "artefactos"
@@ -39,7 +45,6 @@ age = st.selectbox("Age group:", [
     "51 or more"
 ])
 
-# 0–5 → SLIDER
 daily_stress = st.slider("Daily Stress (0–5):", 0, 5, 2)
 
 # ===============================
@@ -84,7 +89,7 @@ personal_awards = st.slider("Personal Awards (0–10)", 0, 10, 1)
 live_vision = st.slider("Life Vision Clarity (1–5)", 1, 5, 3)
 
 # ================================================
-# Crear el diccionario EXACTO que el modelo espera
+# Crear diccionario EXACTO que el modelo espera
 # ================================================
 user_input = {
     "FRUITS_VEGGIES": fruits,
@@ -145,7 +150,24 @@ if st.button("🔮 Predecir"):
     pred_raw = PIPE.predict(df_clean)[0]
     pred_final = float(np.clip(pred_raw, lower, upper))
 
+    # Guardar en historial
+    st.session_state["history"].append({
+        "prediction": pred_final,
+        **user_input
+    })
+
     st.success(f"🎯 Predicción Work-Life Balance Score: **{pred_final:.2f}**")
 
     st.write("📘 Entrada procesada:")
     st.dataframe(df_clean)
+
+# =========================================
+# Mostrar historial acumulado
+# =========================================
+st.header("📚 Historial de predicciones")
+
+if len(st.session_state["history"]) > 0:
+    hist_df = pd.DataFrame(st.session_state["history"])
+    st.dataframe(hist_df)
+else:
+    st.info("Aún no hay predicciones registradas.")
