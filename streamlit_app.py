@@ -62,11 +62,6 @@ sleep_hours = st.number_input("Horas de sueño por día(1-10)", 1, 10, 6)
 # DAILY_STEPS: 10
 daily_steps = st.number_input("Pasos diarios(1-10)", 1, 10, 10)
 
-# En el ejemplo no hay valor para estos → los dejamos en 0 por defecto
-physical_activity = st.number_input("Actividad física semanal (horas)", 0.0, 40.0, 0.0)
-hydration = st.number_input("Hidratación (litros por día)", 0.0, 6.0, 0.0)
-screen_time = st.number_input("Horas frente a pantallas por día", 0.0, 16.0, 0.0)
-
 # WEEKLY_MEDITATION: 5
 weekly_meditation = st.slider("Meditación (veces por semana 0-10)", 0, 10, 5)
 
