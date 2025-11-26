@@ -51,7 +51,7 @@ daily_stress = st.slider("Estrés diario (0–5):", 0, 5, 5)
 # ===============================
 st.header("🏃 Hábitos y Estilo de Vida")
 
-sleep_hours = st.number_input("Horas de sueño por día (1–10)", 1, 10, 6)
+sleep_hours = st.number_input("Horas de sueño por día (0–10)", 0, 10, 6)
 daily_steps = st.number_input("Pasos diarios (1–10)", 1, 10, 10)
 
 weekly_meditation = st.slider("Meditación (veces por semana, 0–10)", 0, 10, 5)
@@ -75,12 +75,12 @@ st.header("🏆 Logros y Productividad")
 
 achievement = st.slider("Logro personal (0–10)", 0, 10, 0)
 donation = st.slider("Donaciones por mes (0–5)", 0, 5, 5)
-bmi_range = st.slider("Categoría de IMC (1–5)", 1, 5, 2)
+bmi_range = st.slider("Categoría de IMC (1–2)", 1, 2, 2)
 todo_completed = st.slider("Tareas completadas por día (0–10)", 0, 10, 4)
 flow = st.slider("Estado de flow (0–10)", 0, 10, 2)
 lost_vacation = st.slider("Días de vacaciones perdidos (0–10)", 0, 10, 5)
 daily_shouting = st.slider("Frecuencia de gritos diarios (0–10)", 0, 10, 1)
-sufficient_income = st.slider("Satisfacción con los ingresos (1–5)", 1, 5, 2)
+sufficient_income = st.slider("Satisfacción con los ingresos (1–2)", 1, 2, 2)
 personal_awards = st.slider("Premios personales (0–10)", 0, 10, 5)
 live_vision = st.slider("Claridad de visión de vida (0–10)", 0, 10, 2)
 
