@@ -24,31 +24,26 @@ PIPE = joblib.load(PIPE_PATH)
 INPUT_SCHEMA = json.load(open(SCHEMA_PATH, "r"))
 POLICY = json.load(open(POLICY_PATH, "r"))
 
-# Cambiar rango a 0–1000
+# Cambiar rango a 0–1000 (solo interfaz)
 lower = 0
 upper = 1000
 
-schema_cols = INPUT_SCHEMA["columns"]
-
 st.title("🔮 Predictor de Equilibrio Vida–Trabajo")
-st.write("Completa todos los campos para obtener una predicción:")
+st.write("Completa los siguientes campos para obtener una predicción personalizada:")
 
 # ===============================
 # SECCIÓN: VARIABLES CATEGÓRICAS
 # ===============================
 st.header("🧩 Información Personal")
 
-# GENDER: 'Female'
 gender = st.selectbox("Género:", ["Female", "Male"], index=0)
 
-# AGE: '36 to 50'
 age = st.selectbox(
     "Grupo de edad:",
     ["Less than 20", "21 to 35", "36 to 50", "51 or more"],
-    index=2  # '36 to 50'
+    index=2
 )
 
-# DAILY_STRESS: '5' → slider en 5
 daily_stress = st.slider("Estrés diario (0–5):", 0, 5, 5)
 
 # ===============================
@@ -56,75 +51,41 @@ daily_stress = st.slider("Estrés diario (0–5):", 0, 5, 5)
 # ===============================
 st.header("🏃 Hábitos y Estilo de Vida")
 
-# SLEEP_HOURS: 6
-sleep_hours = st.number_input("Horas de sueño por día(1-10)", 1, 10, 6)
+sleep_hours = st.number_input("Horas de sueño por día (1–10)", 1, 10, 6)
+daily_steps = st.number_input("Pasos diarios (1–10)", 1, 10, 10)
 
-# DAILY_STEPS: 10
-daily_steps = st.number_input("Pasos diarios(1-10)", 1, 10, 10)
-
-# WEEKLY_MEDITATION: 5
-weekly_meditation = st.slider("Meditación (veces por semana 0-10)", 0, 10, 5)
-
-# TIME_FOR_PASSION: 1
-time_for_passion = st.slider("Tiempo para proyectos personales (0-10)", 0, 10, 1)
+weekly_meditation = st.slider("Meditación (veces por semana, 0–10)", 0, 10, 5)
+time_for_passion = st.slider("Tiempo para proyectos personales (0–10)", 0, 10, 1)
 
 # ===============================
 # SECCIÓN: RELACIONES SOCIALES
 # ===============================
 st.header("🤝 Relaciones Sociales")
 
-# FRUITS_VEGGIES: 4
-fruits = st.slider("Porciones de frutas y verduras(0-5)", 0, 5, 4)
-
-# PLACES_VISITED: 4
-places = st.slider("Lugares visitados por mes(0-10)", 0, 10, 4)
-
-# CORE_CIRCLE: 6
-core_circle = st.slider("Círculo cercano (0-10)", 0, 10, 6)
-
-# SUPPORTING_OTHERS: 5
-supporting_others = st.slider("Apoyo a otros (0–10)", 1, 10, 5)
-
-# SOCIAL_NETWORK: 5
-social_network = st.slider("Red social (1–10)", 0, 10, 5)
+fruits = st.slider("Porciones de frutas y verduras (0–5)", 0, 5, 4)
+places = st.slider("Lugares visitados por mes (0–10)", 0, 10, 4)
+core_circle = st.slider("Círculo cercano (0–10)", 0, 10, 6)
+supporting_others = st.slider("Apoyo a otros (0–10)", 0, 10, 5)
+social_network = st.slider("Red social (0–10)", 0, 10, 5)
 
 # ===============================
 # SECCIÓN: LOGROS / PRODUCTIVIDAD
 # ===============================
 st.header("🏆 Logros y Productividad")
 
-# ACHIEVEMENT: 0
 achievement = st.slider("Logro personal (0–10)", 0, 10, 0)
-
-# DONATION: 5
-donation = st.slider("Donaciones por mes(0-5)", 0, 5, 5)
-
-# BMI_RANGE: 2
-bmi_range = st.slider("Categoría de IMC (1–2)", 1, 2, 2)
-
-# TODO_COMPLETED: 4
-todo_completed = st.slider("Tareas completadas diariamente (0–10)", 0, 10, 4)
-
-# FLOW: 2
+donation = st.slider("Donaciones por mes (0–5)", 0, 5, 5)
+bmi_range = st.slider("Categoría de IMC (1–5)", 1, 5, 2)
+todo_completed = st.slider("Tareas completadas por día (0–10)", 0, 10, 4)
 flow = st.slider("Estado de flow (0–10)", 0, 10, 2)
-
-# LOST_VACATION: 5
-lost_vacation = st.slider("Días de vacaciones perdidos(0-10)", 0, 10, 5)
-
-# DAILY_SHOUTING: 1
-daily_shouting = st.slider("Frecuencia de gritos diarios (0-10)", 0, 10, 1)
-
-# SUFFICIENT_INCOME: 2
-sufficient_income = st.slider("Satisfacción con los ingresos (1–2)", 1, 2, 2)
-
-# PERSONAL_AWARDS: 5
+lost_vacation = st.slider("Días de vacaciones perdidos (0–10)", 0, 10, 5)
+daily_shouting = st.slider("Frecuencia de gritos diarios (0–10)", 0, 10, 1)
+sufficient_income = st.slider("Satisfacción con los ingresos (1–5)", 1, 5, 2)
 personal_awards = st.slider("Premios personales (0–10)", 0, 10, 5)
-
-# LIVE_VISION: 2
-live_vision = st.slider("Claridad de visión de vida (0-10)", 0, 10, 2)
+live_vision = st.slider("Claridad de visión de vida (0–10)", 0, 10, 2)
 
 # ================================================
-# Crear diccionario EXACTO que el modelo espera
+# Diccionario EXACTO que el modelo espera
 # ================================================
 user_input = {
     "FRUITS_VEGGIES": fruits,
@@ -148,7 +109,7 @@ user_input = {
     "TIME_FOR_PASSION": time_for_passion,
     "WEEKLY_MEDITATION": weekly_meditation,
     "AGE": age,
-    "GENDER": gender,
+    "GENDER": gender
 }
 
 # =========================================
@@ -164,8 +125,8 @@ def align(df_raw, schema):
             df[col] = np.nan
 
     for col in cols:
-        t = str(dtypes[col])
-        if "int" in t or "float" in t:
+        dtype = str(dtypes[col])
+        if "int" in dtype or "float" in dtype:
             df[col] = pd.to_numeric(df[col], errors="coerce")
         else:
             df[col] = df[col].astype("string")
@@ -182,23 +143,24 @@ if st.button("🔮 Predecir"):
     pred_raw = PIPE.predict(df_clean)[0]
     pred_final = float(np.clip(pred_raw, lower, upper))
 
+    # Probabilidad 0–100%
+    prob = pred_final / 1000
+
     # Guardar en historial
     st.session_state["history"].append({
         "Predicción": pred_final,
+        "Probabilidad (%)": prob * 100,
         **user_input
     })
 
-    st.success(f"🎯 Puntaje estimado de Equilibrio Vida–Trabajo: **{pred_final:.2f}**")
-    # Probabilidad basada en el rango 0–1000
-    prob = pred_final / 1000
+    st.success(f"🎯 Puntaje estimado: **{pred_final:.2f} / 1000**")
     st.info(f"🔢 Probabilidad estimada de bienestar: **{prob*100:.2f}%**")
-
 
     st.write("📘 Entrada procesada:")
     st.dataframe(df_clean)
 
 # =========================================
-# Mostrar historial acumulado
+# Historial
 # =========================================
 st.header("📚 Historial de predicciones")
 
